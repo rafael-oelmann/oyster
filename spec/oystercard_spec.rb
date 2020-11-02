@@ -40,11 +40,17 @@ describe Oystercard do
     it { is_expected.to respond_to :touch_in }
 
     it 'touching in will change status of in_journey to true' do
+      subject.top_up(5)
       subject.touch_in
       expect(subject).to be_in_journey
     end
 
+    it 'will raise an error if user touches in without money in balance' do 
+      expect { subject.touch_in }.to raise_error "not enough balance"
+    end
+
     it 'touching out in will change status of in_journey to false' do
+      subject.top_up(5)
       subject.touch_in
       subject.touch_out
       expect(subject).not_to be_in_journey
