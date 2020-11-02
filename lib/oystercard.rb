@@ -1,5 +1,5 @@
 class Oystercard
-  attr_reader :balance, :in_journey
+  attr_reader :balance
   LIMIT = 90
 
   def initialize
@@ -7,6 +7,9 @@ class Oystercard
     @in_journey = false
   end
 
+  def in_journey?
+    @in_journey
+  end
 
   def top_up(amount)
     raise "you have exeeded your max balance of #{LIMIT}" if balance + amount > LIMIT
@@ -18,13 +21,13 @@ class Oystercard
     @balance -= amount
   end
 
-  def touch_in 
-    @in_journey = true 
+  def touch_in
+    @in_journey = true
   end
 
-  def touch_out 
-    raise "not in journey" if @in_journey == false
-    @in_journey = false 
-  end
+  def touch_out
+    # raise 'not in journey' if @in_journey == false
 
+    @in_journey = false
+  end
 end
