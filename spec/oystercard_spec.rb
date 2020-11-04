@@ -1,9 +1,14 @@
 require 'oystercard'
 
 describe Oystercard do
-  context '#balance' do
+
+  context '#Initialized Card' do
     it 'when created has a balance of 0' do
       expect(subject.balance).to eq 0
+    end
+
+    it 'when created has an empty list of journeys' do
+      expect(subject.journeys).to be_empty
     end
   end
 
@@ -31,32 +36,40 @@ describe Oystercard do
 
   context '#Touching in/out' do
 
-    let(:station){ double :station }
-    let(:topped_up_card){ Oystercard.new(5)} 
+    let(:entry_station) { double :entry_station }
+    let(:exit_station) { double :exit_station }
+    let(:topped_up_card) { Oystercard.new(5)} 
+    let(:card_in_journey) { Oystercard.new(5).touch_in(entry_station) }
+    
 
     it { is_expected.to respond_to :touch_in }
 
     it 'will raise an error if user touches in without money in balance' do
-      expect { subject.touch_in(station) }.to raise_error "not enough balance"
+      expect { subject.touch_in(entry_station) }.to raise_error "not enough balance"
     end
 
     it 'touching in will change status of in_journey to true' do
-      topped_up_card.touch_in(station)
+      topped_up_card.touch_in(entry_station)
       expect(topped_up_card).to be_in_journey
     end
 
     it 'touching out in will change status of in_journey to false' do
-      topped_up_card.touch_out
+      topped_up_card.touch_out(exit_station)
       expect(topped_up_card).not_to be_in_journey
     end
 
     it 'will charge minimum fare deducting it from balance' do
-      expect { topped_up_card.touch_out }.to change { topped_up_card.balance }.by(-Oystercard::MIN_FARE)
+      expect { topped_up_card.touch_out(exit_station) }.to change { topped_up_card.balance }.by(-Oystercard::MIN_FARE)
     end
 
     it 'stores the entry station' do 
-      topped_up_card.touch_in(station)
-      expect(topped_up_card.entry_station). to eq station  
+      expect(card_in_journey).to eq entry_station  
+    end
+
+    it 'stores the exit_station' do 
+      topped_up_card.touch_in(entry_station)
+      topped_up_card.touch_out(exit_station)
+      expect(topped_up_card.exit_station).to eq exit_station
     end
 
   end
